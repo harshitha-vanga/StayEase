@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEase - Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background:
+                linear-gradient(rgba(10, 30, 55, 0.55),
+                                rgba(10, 30, 55, 0.65)),
+                url("https://images.unsplash.com/photo-1566073771259-6a8506099945");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 430px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 18px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-card h1 {
+            text-align: center;
+            color: #183b63;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #183b63;
+            font-weight: bold;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: #183b63;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-button:hover {
+            background: #d6a84f;
+            color: #183b63;
+        }
+
+        .auth-error {
+            color: #c62828;
+            text-align: center;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 22px;
+        }
+
+        .auth-links a {
+            color: #183b63;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<section class="login-page">
+
+    <div class="login-card">
+
+        <h1>Welcome Back!</h1>
+
+        <p class="subtitle">
+            Login to your StayEase account
+        </p>
+
+        {% if error %}
+            <p class="auth-error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="field">
+                <label>Username</label>
+                <input type="text"
+                       name="username"
+                       placeholder="Enter your username"
+                       required>
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <input type="password"
+                       name="password"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <button type="submit" class="login-button">
+                Login
+            </button>
+        </form>
+
+        <div class="auth-links">
+            Don't have an account?
+            <a href="/register/">Register</a>
+        </div>
+
+        <a href="/" class="back-home">← Back to Home</a>
+
+    </div>
+
+</section>
+
+</body>
+</html>

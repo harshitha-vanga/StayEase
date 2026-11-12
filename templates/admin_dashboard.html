@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEase Admin Dashboard</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #26364a;
+        }
+
+        header {
+            background: #183b63;
+            color: white;
+            padding: 22px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 { margin: 0; }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 13px;
+            box-shadow: 0 4px 15px #0000000c;
+        }
+
+        .card h3 {
+            color: #718096;
+            font-size: 15px;
+            margin-top: 0;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #183b63;
+            margin-bottom: 0;
+        }
+
+        h2 { margin-top: 35px; }
+
+        .table-box {
+            background: white;
+            padding: 20px;
+            border-radius: 13px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5eaf0;
+        }
+
+        th { background: #f8fafc; }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .confirmed { color: #16834a; }
+        .cancelled { color: #dc3545; }
+
+        .action-form {
+            display: inline-block;
+            margin: 3px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 9px 12px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .confirm-btn { background: #16834a; }
+        .cancel-btn { background: #dc3545; }
+
+        .links { margin-top: 25px; }
+
+        .links a {
+            display: inline-block;
+            padding: 12px 18px;
+            margin: 5px;
+            background: #183b63;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+        }
+
+        .messages {
+            background: #e5f8ed;
+            color: #16834a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media(max-width: 600px) {
+            header { padding: 18px; }
+            .container { margin-top: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>StayEase Admin</h2>
+    <a href="{% url 'home' %}">Visit Website ↗</a>
+</header>
+
+<div class="container">
+
+    <h1>Dashboard Overview</h1>
+    <p>Manage your StayEase hotel booking platform.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="messages">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Total Hotels</h3>
+            <p>{{ total_hotels }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Bookings</h3>
+            <p>{{ total_bookings }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Confirmed Bookings</h3>
+            <p>{{ confirmed_bookings }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Cancelled Bookings</h3>
+            <p>{{ cancelled_bookings }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Registered Users</h3>
+            <p>{{ total_users }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Revenue</h3>
+            <p>₹{{ total_revenue|floatformat:2 }}</p>
+        </div>
+
+    </div>
+
+    <h2>Recent Bookings</h2>
+
+    <div class="table-box">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Hotel</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for booking in recent_bookings %}
+
+                <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.customer_name }}</td>
+                    <td>{{ booking.hotel.name }}</td>
+                    <td>{{ booking.check_in }}</td>
+                    <td>{{ booking.check_out }}</td>
+                    <td>₹{{ booking.total_price|floatformat:2 }}</td>
+
+                    <td class="status {% if booking.status == 'Confirmed' %}confirmed{% else %}cancelled{% endif %}">
+                        {{ booking.status }}
+                    </td>
+
+                    <td>
+
+                        {% if booking.status != 'Confirmed' %}
+                        <form class="action-form"
+                              method="POST"
+                              action="{% url 'update_booking_status' booking.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="Confirmed">
+                            <button class="action-btn confirm-btn" type="submit">
+                                Confirm
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        {% if booking.status != 'Cancelled' %}
+                        <form class="action-form"
+                              method="POST"
+                              action="{% url 'update_booking_status' booking.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="Cancelled">
+                            <button class="action-btn cancel-btn" type="submit">
+                                Cancel
+                            </button>
+                        </form>
+                        {% endif %}
+
+                    </td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="8">No bookings available.</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="links">
+        <a href="/admin/bookings/booking/">Manage Bookings</a>
+        <a href="/admin/bookings/hotel/">Manage Hotels</a>
+        <a href="/admin/auth/user/">Manage Users</a>
+    </div>
+
+</div>
+
+</body>
+</html>
